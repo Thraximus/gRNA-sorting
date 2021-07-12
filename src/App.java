@@ -59,7 +59,7 @@ public class App {
                 Gend = row.get(2);
                 score = row.get(3);
                 
-                if (Integer.valueOf(Gstart) >= Integer.valueOf(start) && Integer.valueOf(Gend) <=Integer.valueOf(end) && Integer.valueOf(score) == 0)
+                if (Integer.valueOf(Gstart) >= Integer.valueOf(start) && Integer.valueOf(Gend) <=Integer.valueOf(end) && Integer.valueOf(score) == 0) //start-end-score
                 {
                     GRNArow =  new ArrayList<String>();
                     for (String column : row)
@@ -113,7 +113,7 @@ public class App {
                 Gend = row.get(2);
                 score = row.get(3);
                 
-                if (Integer.valueOf(Gstart) >= Integer.valueOf(start) && Integer.valueOf(Gend) <=Integer.valueOf(end) && Integer.valueOf(score) >= 50)
+                if (Integer.valueOf(Gstart) >= Integer.valueOf(start) && Integer.valueOf(Gend) <=Integer.valueOf(end) && Integer.valueOf(score) >= 50)//start-end-score
                 {
                     GRNArow =  new ArrayList<String>();
                     for (String column : row)
@@ -165,7 +165,7 @@ public class App {
                 Gend = row.get(2);
                 score = row.get(3);
                 
-                if (Integer.valueOf(Gstart) >= Integer.valueOf(start) && Integer.valueOf(Gend) <=Integer.valueOf(end) && Integer.valueOf(score) < 50)
+                if (Integer.valueOf(Gstart) >= Integer.valueOf(start) && Integer.valueOf(Gend) <=Integer.valueOf(end) && Integer.valueOf(score) < 50)//start-end-score
                 {
                     GRNArow =  new ArrayList<String>();
                     for (String column : row)
@@ -230,7 +230,7 @@ public class App {
                 Gend = row.get(2);
                 score = row.get(3);
                 
-                if (Integer.valueOf(Gstart) >= Integer.valueOf(start) && Integer.valueOf(Gend) <=Integer.valueOf(end) && Integer.valueOf(score) >= 50)
+                if (Integer.valueOf(Gstart) >= Integer.valueOf(start) && Integer.valueOf(Gend) <=Integer.valueOf(end) && Integer.valueOf(score) >= 50)//start-end-score
                 {
                     GRNArow =  new ArrayList<String>();
                     GRNArow.add(name);
@@ -285,7 +285,7 @@ public class App {
             }
 
         }
-        try (FileOutputStream outputStream = new FileOutputStream("output/"+"a50_1F.xlsx")) 
+        try (FileOutputStream outputStream = new FileOutputStream("output/"+"a50_1F.xlsx")) //output file name
         {
             workbook.write(outputStream);
         }
@@ -312,7 +312,7 @@ public class App {
             }
 
         }
-        try (FileOutputStream outputStream = new FileOutputStream("output/0/"+name+".xlsx")) 
+        try (FileOutputStream outputStream = new FileOutputStream("output/0/"+name+".xlsx")) //output file name
         {
             workbook.write(outputStream);
         }
@@ -339,7 +339,7 @@ public class App {
             }
 
         }
-        try (FileOutputStream outputStream = new FileOutputStream("output/above_50/"+name+".xlsx")) 
+        try (FileOutputStream outputStream = new FileOutputStream("output/above_50/"+name+".xlsx")) //output file name
         {
             workbook.write(outputStream);
         }
@@ -366,7 +366,7 @@ public class App {
             }
 
         }
-        try (FileOutputStream outputStream = new FileOutputStream("output/below_50/"+name+".xlsx")) 
+        try (FileOutputStream outputStream = new FileOutputStream("output/below_50/"+name+".xlsx")) //output file name
         {
             workbook.write(outputStream);
         }
