@@ -24,10 +24,10 @@ public class App {
         List<List<HSSFCell>> sheetData = getExcelData(filename2);
 
 
+        parse_files_a50_1F(sheet1Data, sheetData);
+
         parse_files(sheet1Data, sheetData);
 
-        
-        
     }
 
 
@@ -78,7 +78,7 @@ public class App {
                 createExcel_0(name, geneGRNA);
             }
             
-
+            /*
             System.out.println(name);
             System.out.println("");
             for (ArrayList<String> row: geneGRNA)
@@ -91,6 +91,7 @@ public class App {
                 System.out.println("");
                 System.out.println("");
             }
+            */
         
             
 
@@ -203,6 +204,92 @@ public class App {
         }
     }
 
+    private static void parse_files_a50_1F(List<List<HSSFCell>> sheet1Data, List<List<HSSFCell>> sheetData) throws Exception
+    {
+        ArrayList<ArrayList<String>> generationData = extractGenerationData(sheetData);
+        ArrayList<ArrayList<String>> grnaData = extractGRNAData(sheet1Data);
+        ArrayList<ArrayList<String>> geneGRNA = new ArrayList<ArrayList<String>>();
+        ArrayList<String> GRNArow =  new ArrayList<String>();
+        String start  = "";
+        String end = "";
+        String name = "";
+        String Gstart = "";
+        String Gend = "";
+        String score = "";
+        geneGRNA = new ArrayList<ArrayList<String>>();
+        for (ArrayList<String> gene: generationData)
+        {
+            
+
+            start  = gene.get(0);
+            end = gene.get(1);
+            name = gene.get(2);
+            for ( ArrayList<String> row : grnaData)
+            {  
+                Gstart = row.get(1);
+                Gend = row.get(2);
+                score = row.get(3);
+                
+                if (Integer.valueOf(Gstart) >= Integer.valueOf(start) && Integer.valueOf(Gend) <=Integer.valueOf(end) && Integer.valueOf(score) >= 50)
+                {
+                    GRNArow =  new ArrayList<String>();
+                    GRNArow.add(name);
+                    for (String column : row)
+                    {
+                        GRNArow.add(column);
+                    }
+                    geneGRNA.add(GRNArow);
+                }
+                
+
+            }
+            
+            /*
+            System.out.println(name);
+            System.out.println("");
+            for (ArrayList<String> row: geneGRNA)
+            {
+                
+                for(String column : row)
+                {
+                    System.out.print(column+" | ");
+                }
+                System.out.println("");
+                System.out.println("");
+            }
+            */
+        }
+
+        createExcel_a50_1F(geneGRNA);
+
+    }
+
+    private static void createExcel_a50_1F( ArrayList<ArrayList<String>> list) throws Exception
+    {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet("Sheet1");
+
+        int rowCount = -1;
+        for (ArrayList<String> data : list)
+        {
+            Row row = sheet.createRow(++rowCount);
+
+            int columnCount = -1;
+
+            for (String data2 : data)
+            {
+                Cell cell = row.createCell(++columnCount);
+                if (data2 instanceof String) {
+                    cell.setCellValue((String) data2);
+                }
+            }
+
+        }
+        try (FileOutputStream outputStream = new FileOutputStream("output/"+"a50_1F.xlsx")) 
+        {
+            workbook.write(outputStream);
+        }
+    }
 
     private static void createExcel_0(String name, ArrayList<ArrayList<String>> list) throws Exception
     {
@@ -322,7 +409,7 @@ public class App {
             column = 0;
             for (HSSFCell cell : data) {
                 
-                if(column == 11 || column == 12 || column == 13)
+                if(column == 3 || column == 4 || column == 5)
                 {
                     
                     String value = df.formatCellValue(cell);
