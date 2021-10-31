@@ -17,16 +17,17 @@ import java.util.List;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        String filename = "C:/Users/eveng/Desktop/GeneCode/GeneCode/BED_with_gRNAs__500_upstream_16.06.2021.xls";
-        String filename2 = "C:/Users/eveng/Desktop/GeneCode/GeneCode/BED_generation_high_confidence.xls";
         
-        List<List<HSSFCell>> sheet1Data = getExcelData(filename);
+        String filename2 = "../Secondary_filter-_lowscores.xls";
+
+        String filename3 = "../secondary_gRNAs.xls";
+        
+        List<List<HSSFCell>> sheet1Data = getExcelData(filename3);
         List<List<HSSFCell>> sheetData = getExcelData(filename2);
 
+        //parse_files_upstream(sheet1Data, sheetData);
 
         parse_files_a50_1F(sheet1Data, sheetData);
-
-        parse_files(sheet1Data, sheetData);
 
     }
 
@@ -204,9 +205,11 @@ public class App {
         }
     }
 
-    private static void parse_files_a50_1F(List<List<HSSFCell>> sheet1Data, List<List<HSSFCell>> sheetData) throws Exception
+    
+    private static void parse_files_upstream(List<List<HSSFCell>> sheet1Data, List<List<HSSFCell>> sheetData) throws Exception
     {
         ArrayList<ArrayList<String>> generationData = extractGenerationData(sheetData);
+        ArrayList<ArrayList<String>> generationDataCorrected = extractGenerationData2(sheetData);
         ArrayList<ArrayList<String>> grnaData = extractGRNAData(sheet1Data);
         ArrayList<ArrayList<String>> geneGRNA = new ArrayList<ArrayList<String>>();
         ArrayList<String> GRNArow =  new ArrayList<String>();
@@ -224,13 +227,76 @@ public class App {
             start  = gene.get(0);
             end = gene.get(1);
             name = gene.get(2);
+            //System.out.println(name);
+            String startCorrected = "";
+            String endCorrected = "";
+            String nameCorrected = "";
+            
+            for ( ArrayList<String> row : grnaData)
+            {  
+                Gstart = row.get(1);
+                Gend = row.get(2);
+                score = row.get(3);
+                boolean overlap = false;
+                for(ArrayList<String> geneCorrected: generationDataCorrected)
+                {
+                    startCorrected = geneCorrected.get(0);
+                    endCorrected = geneCorrected.get(1);
+                    nameCorrected = geneCorrected.get(2);
+
+                    if(nameCorrected != name && Integer.valueOf(Gstart) >= Integer.valueOf(startCorrected) && Integer.valueOf(Gend) <= Integer.valueOf(endCorrected))
+                    {
+                        overlap = true;
+                    }
+                }
+                
+                if (overlap == false && Integer.valueOf(Gstart) >= Integer.valueOf(start) && Integer.valueOf(Gend) <=Integer.valueOf(end) && Integer.valueOf(score) >=0)//start-end-score
+                {
+                    GRNArow =  new ArrayList<String>();
+                    GRNArow.add(name);
+                    for (String column : row)
+                    {
+                        GRNArow.add(column);
+                    }
+                    geneGRNA.add(GRNArow);
+                    //System.out.println("No 0verlap on gene: "+name);
+                }
+                
+
+            }
+        }
+
+        createExcel_a50_1F(geneGRNA);
+
+    }
+
+    private static void parse_files_a50_1F(List<List<HSSFCell>> sheet1Data, List<List<HSSFCell>> sheetData) throws Exception
+    {
+        ArrayList<ArrayList<String>> generationData = extractGenerationData(sheetData);
+        ArrayList<ArrayList<String>> grnaData = extractGRNAData(sheet1Data);
+        ArrayList<ArrayList<String>> geneGRNA = new ArrayList<ArrayList<String>>();
+        ArrayList<String> GRNArow =  new ArrayList<String>();
+        String start  = "";
+        String end = "";
+        String name = "";
+        String Gstart = "";
+        String Gend = "";
+        String score = "";
+        geneGRNA = new ArrayList<ArrayList<String>>();
+        for (ArrayList<String> gene: generationData)
+        {
+            
+
+            start  = gene.get(1);
+            end = gene.get(2);
+            name = gene.get(0);
             for ( ArrayList<String> row : grnaData)
             {  
                 Gstart = row.get(1);
                 Gend = row.get(2);
                 score = row.get(3);
                 
-                if (Integer.valueOf(Gstart) >= Integer.valueOf(start) && Integer.valueOf(Gend) <=Integer.valueOf(end) && Integer.valueOf(score) >= 50)//start-end-score
+                if (Integer.valueOf(Gstart) >= Integer.valueOf(start) && Integer.valueOf(Gend) <=Integer.valueOf(end)  )//start-end-score
                 {
                     GRNArow =  new ArrayList<String>();
                     GRNArow.add(name);
@@ -285,7 +351,7 @@ public class App {
             }
 
         }
-        try (FileOutputStream outputStream = new FileOutputStream("output/"+"a50_1F.xlsx")) //output file name
+        try (FileOutputStream outputStream = new FileOutputStream("output/"+"Secondary.xlsx")) //output file name
         {
             workbook.write(outputStream);
         }
@@ -408,8 +474,76 @@ public class App {
         for (List<HSSFCell> data : sheetData) {
             column = 0;
             for (HSSFCell cell : data) {
+                boolean finished = false;                
+                if(column == 2)
+                {
+                    
+                    String value = df.formatCellValue(cell);
+                    String start ="";
+                    String end = "";
+                    String tmp = "";
+                    for(int i = 0; i<value.length();i++)
+                    {
+                        
+                        if (value.charAt(i)==':')
+                        {
+                            tmp = "";
+                            i++;
+                        }
+                        else if (value.charAt(i)=='-' && !finished)
+                        {
+                            start = tmp ;
+                            row.add(start);
+                            i++;
+                            tmp = "";
+                            finished = true;
+                        }
+                        else if (value.charAt(i)==' ')
+                        {
+                            end = tmp ;
+                            row.add(end);
+                        }
+                        tmp+=value.charAt(i);
+                    }
+
+                    
+                   
+                    
+                }else if(column == 0)
+                {
+                    
+                    String value = df.formatCellValue(cell);
+                    row.add(value);
+                    
+                }
+                column++;
                 
-                if(column == 3 || column == 4 || column == 5)
+                    
+            }
+            if (skip == false)
+            {
+                table.add(row);
+            }
+            else
+            {
+                skip = false;
+            }
+            row = new ArrayList<String>();
+        }
+        return table;
+    }
+
+    private static ArrayList<ArrayList<String>> extractGenerationData2(List<List<HSSFCell>> sheetData) {
+        int column = 0;
+        boolean skip = true;
+        ArrayList<ArrayList<String>> table = new ArrayList<ArrayList<String>>();
+        ArrayList<String> row  = new ArrayList<String>();
+        DataFormatter df = new DataFormatter();
+        for (List<HSSFCell> data : sheetData) {
+            column = 0;
+            for (HSSFCell cell : data) {
+                
+                if(column == 24 || column == 25 || column == 26)
                 {
                     
                     String value = df.formatCellValue(cell);
@@ -442,7 +576,7 @@ public class App {
             column = 0;
             for (HSSFCell cell : data) {
 
-                if (column == 10)
+                if (column == 11)
                 {
                     
                     DataFormatter df = new DataFormatter();
